@@ -1,0 +1,41 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" android:id="@+id/root_layout">
+    <FrameLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:background="@drawable/tag_bg"
+        android:layout_height="50dp" >
+        <ImageView
+            android:id="@+id/imageView1"
+            style="@style/MyTab"
+            android:clickable="true"
+            android:src="@drawable/refresh" />//Src和selector合在一起才有用！！不能用Background或者drawableTop
+        <ImageView
+            android:id="@+id/imageView2"
+            style="@style/MyTab"
+            android:clickable="true"
+            android:src="@drawable/refresh" />
+        <ImageView
+            android:id="@+id/imageView3"
+            style="@style/MyTab"
+            android:clickable="true"
+            android:src="@drawable/refresh" />
+        <ImageView
+            android:id="@+id/imageView4"
+            style="@style/MyTab"
+            android:clickable="true"
+            android:src="@drawable/refresh" />
+        <ImageView
+            android:id="@+id/imageView5"
+            style="@style/MyTab"
+            android:clickable="true"
+            android:src="@drawable/refresh" />
+    </LinearLayout>
+</LinearLayout>
