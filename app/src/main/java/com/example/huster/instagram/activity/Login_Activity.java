@@ -3,7 +3,6 @@ package com.example.huster.instagram.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,14 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.example.huster.instagram.R;
-import com.example.huster.instagram.util.PkuHttp;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-
-import java.io.IOException;
 
 public class Login_Activity extends Activity {
     String url = "http://219.223.196.213:8080/pkuServlet/pkuServlet";
@@ -50,7 +42,7 @@ public class Login_Activity extends Activity {
         etUsername = (EditText)findViewById(R.id.username);
         etPassword = (EditText)findViewById(R.id.password);
         imgLogo = (ImageView)findViewById(R.id.logo);
-        btLogin = (Button)findViewById(R.id.login_button);
+        btLogin = (Button)findViewById(R.id.button_login);
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,11 +53,11 @@ public class Login_Activity extends Activity {
                         startActivity(intent);
                     }
                     else{
-                        Toast.makeText(getBaseContext(), username+" "+password, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), "用户名或密码错误", Toast.LENGTH_SHORT).show();
                     }
                 }
                 else{
-                    Toast.makeText(getBaseContext(), "用户名或密码不能为空", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), "用户名和密码不能为空", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -77,6 +69,7 @@ public class Login_Activity extends Activity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("username", "huster");
                 editor.putString("password", "kang");
+                editor.commit();
                 Toast.makeText(getBaseContext(), "Create Successful", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);

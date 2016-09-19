@@ -15,13 +15,16 @@ import com.example.huster.instagram.R;
 import com.example.huster.instagram.factory.FragmentFactory;
 import com.example.huster.instagram.util.Constant;
 
+import java.util.HashMap;
+
 public class MainActivity extends Activity{
     public Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
         }
     };
-    ImageView []imageView = new ImageView[5];
+//    ImageView []imageView = new ImageView[5];
+    private HashMap<String, ImageView> imageViewMap = new HashMap<>();
     int checkId = 0;
     private FragmentManager fragmentManager;
     private Fragment[] fragments = new Fragment[5];
@@ -32,11 +35,11 @@ public class MainActivity extends Activity{
         InitTabListener();
     }
     void InitTabListener(){
-        imageView[0] = (ImageView)findViewById(R.id.imageView1);
-        imageView[1] = (ImageView)findViewById(R.id.imageView2);
-        imageView[2] = (ImageView)findViewById(R.id.imageView3);
-        imageView[3] = (ImageView)findViewById(R.id.imageView4);
-        imageView[4] = (ImageView)findViewById(R.id.imageView5);
+//        imageView[0] = (ImageView)findViewById(R.id.imageView1);
+//        imageView[1] = (ImageView)findViewById(R.id.imageView2);
+//        imageView[2] = (ImageView)findViewById(R.id.imageView3);
+//        imageView[3] = (ImageView)findViewById(R.id.imageView4);
+//        imageView[4] = (ImageView)findViewById(R.id.imageView5);
         for(int i = 0; i<5; i++) fragments[i] = null;
         fragmentManager = getFragmentManager();
         imageView[0].setOnClickListener(new View.OnClickListener() {
