@@ -1,6 +1,7 @@
 package com.example.huster.instagram.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -65,7 +66,7 @@ public class MainActivity extends FragmentActivity{
                 imageView[1].setImageResource(R.drawable.refresh_pressed);
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
                 if(fragments[1]==null){
-                    fragments[1] = FragmentFactory.getInstanceByID(Constant.FragmentSearchID);
+                    fragments[1] = FragmentFactory.getInstanceByID(Constant.FragmentDiscoverID);
                     transaction.add(R.id.content, fragments[1]);
                 }
                 if(fragments[checkId]!=null) transaction.hide(fragments[checkId]);
@@ -77,18 +78,8 @@ public class MainActivity extends FragmentActivity{
         imageView[2].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(checkId==2) return;
-                imageView[checkId].setImageResource(R.drawable.refresh);
-                imageView[2].setImageResource(R.drawable.refresh_pressed);
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                if(fragments[2]==null){
-                    fragments[2] = FragmentFactory.getInstanceByID(Constant.FragmentCameraID);
-                    transaction.add(R.id.content, fragments[2]);
-                }
-                if(fragments[checkId]!=null) transaction.hide(fragments[checkId]);
-                transaction.show(fragments[2]);
-                transaction.commit();
-                checkId = 2;
+                Intent intent = new Intent(getBaseContext(), CameraActivity.class);
+                startActivity(intent);
             }
         });
         imageView[3].setOnClickListener(new View.OnClickListener() {

@@ -1,19 +1,18 @@
 package com.example.huster.instagram.factory;
 
 //import android.support.v4.app.Fragment;
-import com.example.huster.instagram.fragment.FragmentHomeState;
-import com.example.huster.instagram.fragment.FragmentPushState;
+import com.example.huster.instagram.fragment.FragmentDiscover;
+import com.example.huster.instagram.fragment.FragmentHot;
+import com.example.huster.instagram.fragment.FragmentMyComment;
+import com.example.huster.instagram.fragment.FragmentNearby;
 import com.example.huster.instagram.util.Constant;
 import android.support.v4.app.Fragment;
-import android.content.Context;
-import com.example.huster.instagram.fragment.FragmentCamera;
+
 import com.example.huster.instagram.fragment.FragmentHome;
-import com.example.huster.instagram.fragment.FragmentHot;
+import com.example.huster.instagram.fragment.FragmentMyState;
 import com.example.huster.instagram.fragment.FragmentLove;
 import com.example.huster.instagram.fragment.FragmentPersonal;
-import com.example.huster.instagram.fragment.FragmentSave;
-import com.example.huster.instagram.fragment.FragmentSearch;
-
+import com.example.huster.instagram.fragment.FragmentCollect;
 /**
  * Created by huster on 2016/9/15.
  */
@@ -25,11 +24,8 @@ public class FragmentFactory {
             case Constant.FragmentHomeID:
                 fragment = new FragmentHome();
                 break;
-            case Constant.FragmentSearchID:
-                fragment = new FragmentSearch();
-                break;
-            case Constant.FragmentCameraID:
-                fragment = new FragmentCamera();
+            case Constant.FragmentDiscoverID:
+                fragment = new FragmentDiscover();
                 break;
             case Constant.FragmentLoveID:
                 fragment = new FragmentLove();
@@ -37,17 +33,23 @@ public class FragmentFactory {
             case Constant.FragmentPersonalID:
                 fragment = new FragmentPersonal();
                 break;
+            case Constant.FragmentMyStateID:
+                fragment = new FragmentMyState();
+                break;
+            case Constant.FragmentCollectID:
+                fragment = new FragmentCollect();
+                break;
+            case Constant.FragmentMyCommentID:
+                fragment = new FragmentMyComment();
+                break;
             case Constant.FragmentHotID:
                 fragment = new FragmentHot();
                 break;
-            case Constant.FragmentSaveID:
-                fragment = new FragmentSave();
+            case Constant.FragmentNearbyID:
+                fragment = new FragmentNearby();
                 break;
-            case Constant.FragmentHomeStateID:
-                fragment = new FragmentHomeState();
-                break;
-            case Constant.FragmentPushStateID:
-                fragment = new FragmentPushState();
+            case Constant.FragmentRecommendID:
+                fragment = new FragmentNearby();
                 break;
         }
         return fragment;
