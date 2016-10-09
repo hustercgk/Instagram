@@ -17,8 +17,13 @@ public class FragmentLove extends Fragment {
     private ViewPager mViewPager;
     private TabLayout mTablayout;
     private ArrayList<Fragment> fragments = new ArrayList<>();
+    static Fragment fragmentLove = null;
     public FragmentLove() {
         // Required empty public constructor
+    }
+    static public Fragment newInstance(){
+        if(fragmentLove==null) fragmentLove = new FragmentLove();
+        return fragmentLove;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,10 +49,10 @@ public class FragmentLove extends Fragment {
     void InitView(){
         mViewPager = (ViewPager)getView().findViewById(R.id.viewpager_love);
         mTablayout = (TabLayout)getView().findViewById(R.id.tab_love);
-        fragments.add(FragmentFactory.getInstanceByID(Constant.FragmentMyStateID));
-        fragments.add(FragmentFactory.getInstanceByID(Constant.FragmentMyCommentID));
-        fragments.add(FragmentFactory.getInstanceByID(Constant.FragmentCollectID));
-        mViewPager.setAdapter(new ViewPagerAdapter(getFragmentManager(), fragments));//如果出问题，改成getChildFragmentManager()
+        fragments.add(FragmentMyState.newInstance());
+        fragments.add(FragmentMyComment.newInstance());
+        fragments.add(FragmentCollect.newInstance());
+        mViewPager.setAdapter(new ViewPagerAdapter(getChildFragmentManager(), fragments));//如果出问题，改成getChildFragmentManager()
         mViewPager.setCurrentItem(0);
         mTablayout.addTab(mTablayout.newTab().setText("我的"));
         mTablayout.addTab(mTablayout.newTab().setText("评论"));
@@ -57,5 +62,11 @@ public class FragmentLove extends Fragment {
         mTablayout.getTabAt(0).setText("我的");
         mTablayout.getTabAt(1).setText("评论");
         mTablayout.getTabAt(2).setText("收藏");
+    }
+
+    @Override
+    public void onDestroy() {
+        fragmentLove = null;
+        super.onDestroy();
     }
 }

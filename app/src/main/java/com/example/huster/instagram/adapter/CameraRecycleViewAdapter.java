@@ -3,6 +3,7 @@ package com.example.huster.instagram.adapter;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,17 +33,21 @@ public class CameraRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_view, parent, false);
+        Log.d("kangkang", "onCreateViewHolder");
         v.setOnClickListener(this);
         return new ViewHolder(v);
     }
 
     @Override
     public int getItemCount() {
+        Log.d("kangkang", "getItemCount");
         return mList==null?0:mList.size();
+
     }
 
     @Override
     public int getItemViewType(int position) {
+        Log.d("kangkang", "getItemViewType");
         return super.getItemViewType(position);
     }
 
@@ -51,7 +56,13 @@ public class CameraRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         ViewHolder viewHolder = (ViewHolder)holder;
         viewHolder.string = mList.get(position);
         viewHolder.itemView.setTag(mList.get(position));
-        Picasso.with(mContext).load(new File(mList.get(position))).resize(w/3, h/4).centerCrop().into(viewHolder.imageView);
+        Log.d("kangkang", "onBindViewHolder");
+        Picasso.with(mContext)
+                .load(new File(viewHolder.string))
+                .placeholder(R.drawable.android)//未加载完成时放置的缺省图片
+                .resize(w / 4, h / 5)
+                .centerCrop()
+                .into(viewHolder.imageView);
     }
 
     @Override
@@ -63,12 +74,16 @@ public class CameraRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        String string;
-
+        public ImageView imageView;
+        public String string;
         public ViewHolder(View v) {
             super(v);
             imageView = (ImageView) v.findViewById(R.id.image_grid);
+            /*设置高度，不然高度不会1/5，在placeholder时*/
+            ViewGroup.LayoutParams layoutParams =  imageView.getLayoutParams();
+            layoutParams.height = CameraActivity.screenHeight/5;
+            imageView.setLayoutParams(layoutParams);
+         /**/
         }
     }
     public interface OnRecyclerViewItemClickListener {

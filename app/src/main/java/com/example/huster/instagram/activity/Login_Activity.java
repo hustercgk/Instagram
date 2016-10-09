@@ -36,6 +36,7 @@ public class Login_Activity extends Activity {
         if(!username.equals("") && !password.equals("")){
             Intent intent = new Intent(getBaseContext(), MainActivity.class);
             startActivity(intent);
+            finish();
         }
     }
     void InitWidgets(){
@@ -73,6 +74,7 @@ public class Login_Activity extends Activity {
                 Toast.makeText(getBaseContext(), "Create Successful", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
         etUsername.setWidth((int)(screenWidth*0.75));

@@ -14,11 +14,14 @@ import com.example.huster.instagram.R;
  */
 public class FragmentRecommend extends Fragment {
 
-
+    static Fragment fragmentRecommend = null;
     public FragmentRecommend() {
         // Required empty public constructor
     }
-
+    static public Fragment newInstance(){
+        if(fragmentRecommend==null) fragmentRecommend = new FragmentRecommend();
+        return fragmentRecommend;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -27,4 +30,9 @@ public class FragmentRecommend extends Fragment {
         return inflater.inflate(R.layout.fragment_recomment, container, false);
     }
 
+    @Override
+    public void onDestroy() {
+        fragmentRecommend = null;
+        super.onDestroy();
+    }
 }

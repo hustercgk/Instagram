@@ -33,4 +33,6 @@ dependencies {
     compile 'in.srain.cube:ultra-ptr:1.0.11'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.yalantis:ucrop:1.0.1'
+    compile 'com.facebook.fresco:fresco:0.13.0'
+    compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
 }

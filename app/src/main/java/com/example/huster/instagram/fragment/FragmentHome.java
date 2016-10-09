@@ -29,7 +29,12 @@ public class FragmentHome extends Fragment {
     protected Context mContext;
     private ArrayList<String> list= new ArrayList<>();
     private boolean isloading = false, isresfresh = false, isaddprogressbar = false;
+    static Fragment fragmentHome = null;
     public  FragmentHome(){}
+    static public Fragment newInstance(){
+        if(fragmentHome==null) fragmentHome = new FragmentHome();
+        return fragmentHome;
+    }
     @SuppressLint("ValidFragment")
     public FragmentHome(Context context){
         this.mContext = context;
@@ -127,5 +132,11 @@ public class FragmentHome extends Fragment {
             homeAdapter.notifyDataSetChanged();
             isresfresh = false;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        fragmentHome = null;
+        super.onDestroy();
     }
 }

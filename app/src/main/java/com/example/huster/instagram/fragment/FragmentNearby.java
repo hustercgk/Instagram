@@ -14,11 +14,14 @@ import com.example.huster.instagram.R;
  */
 public class FragmentNearby extends Fragment {
 
-
+    static Fragment fragmentNearby = null;
     public FragmentNearby() {
         // Required empty public constructor
     }
-
+    static public Fragment newInstance(){
+        if(fragmentNearby==null) fragmentNearby = new FragmentNearby();
+        return fragmentNearby;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -27,4 +30,9 @@ public class FragmentNearby extends Fragment {
         return inflater.inflate(R.layout.fragment_nearby, container, false);
     }
 
+    @Override
+    public void onDestroy() {
+        fragmentNearby = null;
+        super.onDestroy();
+    }
 }

@@ -9,8 +9,13 @@ import android.view.ViewGroup;
 import com.example.huster.instagram.R;
 
 public class FragmentMyState extends Fragment {
+    static Fragment fragmentMyState = null;
     public FragmentMyState(){
 
+    }
+    static public Fragment newInstance(){
+        if(fragmentMyState==null) fragmentMyState = new FragmentMyState();
+        return fragmentMyState;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -24,4 +29,9 @@ public class FragmentMyState extends Fragment {
         return inflater.inflate(R.layout.fragment_my_state, container, false);
     }
 
+    @Override
+    public void onDestroy() {
+        fragmentMyState = null;
+        super.onDestroy();
+    }
 }

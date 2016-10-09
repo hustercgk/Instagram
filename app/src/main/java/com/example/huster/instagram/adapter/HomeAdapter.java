@@ -28,7 +28,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if(holder instanceof ViewHolder){
             ViewHolder viewHolder = (ViewHolder)holder;
-            viewHolder.imageView.setImageResource(R.drawable.test);
+            viewHolder.imageView.setImageResource(R.drawable.test1);
             return;
         }
         if(holder instanceof FooterHolder){

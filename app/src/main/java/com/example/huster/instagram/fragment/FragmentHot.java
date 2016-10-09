@@ -13,12 +13,14 @@ import com.example.huster.instagram.R;
  * A simple {@link Fragment} subclass.
  */
 public class FragmentHot extends Fragment {
-
-
+    static Fragment fragmentHot = null;
     public FragmentHot() {
         // Required empty public constructor
     }
-
+    static public Fragment newInstance(){
+        if(fragmentHot==null) fragmentHot = new FragmentHot();
+        return fragmentHot;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -26,4 +28,9 @@ public class FragmentHot extends Fragment {
         return inflater.inflate(R.layout.fragment_hot, container, false);
     }
 
+    @Override
+    public void onDestroy() {
+        fragmentHot = null;
+        super.onDestroy();
+    }
 }

@@ -11,11 +11,14 @@ import android.view.ViewGroup;
 import com.example.huster.instagram.R;
 
 public class FragmentPersonal extends Fragment {
-
+    static Fragment fragmentPersonal = null;
     public FragmentPersonal() {
         // Required empty public constructor
     }
-
+    static public Fragment newInstance(){
+        if(fragmentPersonal==null) fragmentPersonal = new FragmentPersonal();
+        return fragmentPersonal;
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,4 +31,9 @@ public class FragmentPersonal extends Fragment {
         return inflater.inflate(R.layout.fragment_personal, container, false);
     }
 
+    @Override
+    public void onDestroy() {
+        fragmentPersonal = null;
+        super.onDestroy();
+    }
 }
