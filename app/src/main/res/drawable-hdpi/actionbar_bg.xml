@@ -4,12 +4,15 @@
         android:right="-2dp"
         android:left="-2dp">
         <shape>
-            <solid android:color="@android:color/transparent"/>
+            <solid android:color="#fff"></solid>
             <stroke
-                android:width="1.5dp"
+                android:width="2dp"
                 android:color="#eee"/>
-            <solid android:color="#FFFFFF"></solid>
         </shape>
     </item>
-
+    <!--<item>-->
+        <!--<shape>-->
+            <!--<solid android:color="#ffffff"></solid>-->
+        <!--</shape>-->
+    <!--</item>-->
 </layer-list>

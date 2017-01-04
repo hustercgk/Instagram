@@ -3,161 +3,527 @@ package com.example.huster.instagram.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.hardware.Camera;
+import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.support.design.widget.TabLayout;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.huster.instagram.R;
-import com.example.huster.instagram.adapter.CameraRecycleViewAdapter;
-import com.example.huster.instagram.adapter.HomeAdapter;
-import com.squareup.picasso.Picasso;
-import com.yalantis.ucrop.UCrop;
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
+import com.example.huster.instagram.util.BitmapUtils;
+import com.example.huster.instagram.util.CameraUtil;
+import com.example.huster.instagram.util.Constant;
+import com.example.huster.instagram.util.SystemUtils;
 
-public class CameraActivity extends Activity {
-    ArrayList<String> listImageSrc = new ArrayList<>();
-    RecyclerView mRecyclerView;
-    CameraRecycleViewAdapter cameraRecycleViewAdapter;
-    CardView cardView;
-    private Handler mHandler;
-    public static int screenWidth, screenHeight;
-    final int MAX_IMG_NUMS = 20;
-    boolean isloading = false;
-    int imgIdLast = 0;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.List;
+
+public class CameraActivity extends Activity implements SurfaceHolder.Callback, View.OnClickListener {
+    private Camera mCamera;
+    private SurfaceView surfaceView;
+    private SurfaceHolder mHolder;
+    //默认前置或者后置相机 这里暂时设置为前置
+    private int mCameraId = 0;
+    private Context context;
+
+    //屏幕宽高
+    private int screenWidth;
+    private int screenHeight;
+    private LinearLayout home_custom_top_relative;
+    private ImageView camera_delay_time;
+    private View homeCustom_cover_top_view;
+    private View homeCustom_cover_bottom_view;
+    private View home_camera_cover_top_view;
+    private View home_camera_cover_bottom_view;
+    private ImageView flash_light;
+    private TextView camera_delay_time_text;
+    private ImageView camera_square;
+    private int index;
+    //底部高度 主要是计算切换正方形时的动画高度
+    private int menuPopviewHeight;
+    //动画高度
+    private int animHeight;
+    //闪光灯模式 0:关闭 1: 开启 2: 自动
+    private int light_num = 0;
+    //延迟时间
+    private int delay_time;
+    private int delay_time_temp;
+    private boolean isview = false;
+    private boolean is_camera_delay;
+    private ImageView camera_frontback;
+    private ImageView camera_close;
+    private RelativeLayout homecamera_bottom_relative;
+    private ImageView img_camera;
+    private int picHeight;
+    private RelativeLayout buttom_relative;
+    Button button1, button2;
+    int actionbarHeight;
+    TabLayout tabLayout;
+    int id = 0;
+    MediaRecorder mediaRecorder = null;
+    boolean mIsRecording = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        context = this;
+        initView();
+        initData();
+    }
+    private void initView() {
+        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+        mHolder = surfaceView.getHolder();
+        mHolder.addCallback(this);
+//        img_camera = (ImageView) findViewById(R.id.img_camera);
+//        img_camera.setOnClickListener(this);
+        button1 = (Button)findViewById(R.id.takePicBtn);
+        button2 = (Button)findViewById(R.id.switchCameraBtn);
+        button1.setOnClickListener(this);
+        button2.setOnClickListener(this);
+        buttom_relative = (RelativeLayout)findViewById(R.id.camera_button_relative);
+
+        RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.top_relative);
+        actionbarHeight = relativeLayout.getLayoutParams().height;
+        relativeLayout.bringToFront();
+
+        tabLayout = (TabLayout)findViewById(R.id.tablayout_activity_camera);
+        tabLayout.addTab(tabLayout.newTab().setText(R.string.picture).setTag("picture"));
+        tabLayout.addTab(tabLayout.newTab().setText(R.string.record).setTag("record"));
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getTag().equals("picture")){
+                    id = 0;
+                }
+                else{
+                    id = 1;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+//        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.top_relative);
+//        actionbarHeight = linearLayout.getLayoutParams().height;
+        //关闭相机界面按钮
+//        camera_close = (ImageView) findViewById(R.id.camera_close);
+//        camera_close.setOnClickListener(this);
+
+        //top 的view
+//        home_custom_top_relative = (LinearLayout) findViewById(R.id.home_custom_top_relative);
+//        home_custom_top_relative.setAlpha(0.5f);
+
+        //前后摄像头切换
+//        camera_frontback = (ImageView) findViewById(R.id.camera_frontback);
+//        camera_frontback.setOnClickListener(this);
+//
+//        //延迟拍照时间
+//        camera_delay_time = (ImageView) findViewById(R.id.camera_delay_time);
+//        camera_delay_time.setOnClickListener(this);
+
+        //正方形切换
+//        camera_square = (ImageView) findViewById(R.id.camera_square);
+//        camera_square.setOnClickListener(this);
+
+        //切换正方形时候的动画
+//        homeCustom_cover_top_view = findViewById(R.id.homeCustom_cover_top_view);
+//        homeCustom_cover_bottom_view = findViewById(R.id.homeCustom_cover_bottom_view);
+//
+//        homeCustom_cover_top_view.setAlpha(0.5f);
+//        homeCustom_cover_bottom_view.setAlpha(0.5f);
+
+        //拍照时动画
+//        home_camera_cover_top_view = findViewById(R.id.home_camera_cover_top_view);
+//        home_camera_cover_bottom_view = findViewById(R.id.home_camera_cover_bottom_view);
+//        home_camera_cover_top_view.setAlpha(1);
+//        home_camera_cover_bottom_view.setAlpha(1);
+
+        //闪光灯
+//        flash_light = (ImageView) findViewById(R.id.flash_light);
+//        flash_light.setOnClickListener(this);
+//
+//        camera_delay_time_text = (TextView) findViewById(R.id.camera_delay_time_text);
+//
+//        homecamera_bottom_relative = (RelativeLayout) findViewById(R.id.homecamera_bottom_relative);
+    }
+
+    private void initData() {
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+//        screenWidth = dm.widthPixels;
+//        screenHeight = dm.heightPixels;
         screenWidth = getResources().getDisplayMetrics().widthPixels;
         screenHeight = getResources().getDisplayMetrics().heightPixels;
-        InitView();
-        new LoadImgSrc().execute();
-//        new LoadMoreImgAndShow().execute();
+        menuPopviewHeight = screenHeight - screenWidth * 4 / 3;
+        animHeight = (screenHeight - screenWidth - menuPopviewHeight - SystemUtils.dp2px(context, 44)) / 2;
+
+        //这里相机取景框我这是为宽高比3:4 所以限制底部控件的高度是剩余部分
+        RelativeLayout.LayoutParams bottomParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, menuPopviewHeight);
+        bottomParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+//        homecamera_bottom_relative.setLayoutParams(bottomParam);
     }
-    void InitView(){
-        cardView = (CardView)findViewById(R.id.card_view);
 
-        mRecyclerView = (RecyclerView)findViewById(R.id.camera_list);
-    }
-//    class LoadMoreImgAndShow extends AsyncTask{
-//        @Override
-//        protected Object doInBackground(Object[] params) {
-//            //一次30张
-//            if(imgIdLast>0){
-//                int i;
-//                for(i = imgIdLast; i>imgIdLast-MAX_IMG_NUMS && i>0; i--){
-//                    listShowImg.add(listImageSrc.get(i));
-//                }
-//                imgIdLast = i;
-//            }
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Object o) {
-//            super.onPostExecute(o);
-//            cameraRecycleViewAdapter.notifyDataSetChanged();
-//            isloading = false;
-//        }
-//    }
-
-    class LoadImgSrc extends AsyncTask{
-        @Override
-        protected Object doInBackground(Object[] params) {
-            // 扫描外部设备中的照片
-            String str[] = { MediaStore.Images.Media._ID,
-                    MediaStore.Images.Media.DISPLAY_NAME,
-                    MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, str,
-                    null, null, null);
-            while (cursor.moveToNext()) {
-//                System.out.println(cursor.getString(0)); // 图片ID
-//                System.out.println(cursor.getString(1)); // 图片文件名
-//                System.out.println(cursor.getString(2)); // 图片绝对路径
-//                System.out.println(new Date(new File(cursor.getString(2)).lastModified())+"");
-                listImageSrc.add(0, cursor.getString(2));
-            }
-//            imgIdLast = listImageSrc.size()-1;
-//       //     初始化listShowImg
-//            for(int i = listImageSrc.size()-1; i>=0; i--){
-//                listShowImg.add("");
-//            }
-////            初步显示
-//            for(int i = 0; i<listImageSrc.size() && i<MAX_IMG_NUMS; i++){
-//                listShowImg.set(i, listImageSrc.get(i));
-//            }
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-            mRecyclerView.setLayoutManager(new GridLayoutManager(getBaseContext(), 4));
-            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            cameraRecycleViewAdapter = new CameraRecycleViewAdapter(getBaseContext(), listImageSrc, screenWidth, screenHeight);
-            mRecyclerView.setAdapter(cameraRecycleViewAdapter);
-            cameraRecycleViewAdapter.setOnItemClickListener(new CameraRecycleViewAdapter.OnRecyclerViewItemClickListener() {
-                @Override
-                public void onItemClick(View view, String src) {
-//                    Intent intent = new Intent(getBaseContext(), ImageFilterActivity.class);
-//                    intent.putExtra("file", src);
-//                    startActivity(intent);
-                    /*暂且调用系统的剪切图片*/
-                    Intent intent = new Intent();
-                    intent.setAction("com.android.camera.action.CROP");
-                    Uri uri = Uri.fromFile(new File(src));
-                    intent.setDataAndType(uri, "image/*");
-                    /*圆形，但是在三星上行不通啊！*/
-//                    intent.putExtra("outputX", 300);  //裁剪图片的宽
-//                    intent.putExtra("outputY", 300);
-                    intent.putExtra("aspectX", 1);  //裁剪方框宽的比例
-                    intent.putExtra("aspectY", 1);
-                    /**/
-                    intent.putExtra("scale", true);  //是否保持比例
-                    startActivityForResult(intent, 1);
-                }
-            });
-            mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    //如果到达顶部或者底部，这个函数不会再调用,并且次函数比下面的先调用
-                }
-
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    super.onScrollStateChanged(recyclerView, newState);
-//                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-//                        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-//                        int first = layoutManager.findFirstVisibleItemPosition();
-//                        int last = layoutManager.findLastVisibleItemPosition();
-//                        for (int i = first; i < listImageSrc.size() && i <= last; i++) {
-//                            CameraRecycleViewAdapter.ViewHolder viewHolder = (CameraRecycleViewAdapter.ViewHolder) mRecyclerView.findViewHolderForAdapterPosition(i);
-//                            Picasso.with(getBaseContext()).load(new File(viewHolder.string)).resize(screenWidth / 4, screenHeight / 5).centerCrop().into(viewHolder.imageView);
-//                        }
+    private Handler mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+            int what = msg.what;
+//            switch (what) {
+//                case Constant.WHAT.SUCCESS:
+//                    if (delay_time > 0) {
+//                        camera_delay_time_text.setText("" + delay_time);
 //                    }
+//
+//                    try {
+//                        if (delay_time == 0) {
+//                            captrue();
+//                            is_camera_delay = false;
+//                            camera_delay_time_text.setVisibility(View.GONE);
+//                        }
+//                    } catch (Exception e) {
+//                        return;
+//                    }
+//
+//                    break;
+//
+//                case Constant.WHAT.ERROR:
+//                    is_camera_delay = false;
+//                    break;
+//
+//            }
+        }
+    };
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.takePicBtn:
+                if (isview) {
+                    if (delay_time == 0) {
+                        switch (light_num) {
+                            case 0:
+                                //关闭
+                                CameraUtil.getInstance().turnLightOff(mCamera);
+                                break;
+                            case 1:
+                                CameraUtil.getInstance().turnLightOn(mCamera);
+                                break;
+                            case 2:
+                                //自动
+                                CameraUtil.getInstance().turnLightAuto(mCamera);
+                                break;
+                        }
+                        capture();
+                    } else {
+                        camera_delay_time_text.setVisibility(View.VISIBLE);
+                        camera_delay_time_text.setText(String.valueOf(delay_time));
+                        is_camera_delay = true;
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                while (delay_time > 0) {
+                                    //按秒数倒计时
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        mHandler.sendEmptyMessage(Constant.WHAT.ERROR);
+                                        return;
+                                    }
+                                    delay_time--;
+                                    mHandler.sendEmptyMessage(Constant.WHAT.SUCCESS);
+                                }
+                            }
+                        }).start();
+                    }
+                    isview = false;
                 }
-            });
+                break;
+
+//            case R.id.camera_square:
+//                if (index == 0) {
+//                    camera_square_0();
+//                } else if (index == 1) {
+//                    camera_square_1();
+//                }
+//                break;
+
+            case R.id.switchCameraBtn:
+                switchCamera();
+                break;
+
+            //退出相机界面 释放资源
+//            case R.id.camera_close:
+//                if (is_camera_delay) {
+//                    Toast.makeText(CameraActivity.this, "正在拍照请稍后...", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                finish();
+//                break;
+
+            //闪光灯
+//            case R.id.flash_light:
+//                switch (light_num) {
+//                    case 0:
+//                        //打开
+//                        light_num = 1;
+//                        flash_light.setImageResource(R.drawable.test);
+////                        CameraUtil.getInstance().turnLightOn(mCamera);
+//                        break;
+//                    case 1:
+//                        //自动
+//                        light_num = 2;
+////                        CameraUtil.getInstance().turnLightAuto(mCamera);
+//                        flash_light.setImageResource(R.drawable.test);
+//                        break;
+//                    case 2:
+//                        //关闭
+//                        light_num = 0;
+////                        CameraUtil.getInstance().turnLightOff(mCamera);
+//                        flash_light.setImageResource(R.drawable.test);
+//                        break;
+//                }
+//
+//                break;
+
+            //延迟拍照时间
+//            case R.id.camera_delay_time:
+//                switch (delay_time) {
+//                    case 0:
+//                        delay_time = 3;
+//                        delay_time_temp = delay_time;
+//                        camera_delay_time.setImageResource(R.drawable.test);
+//                        break;
+//
+//                    case 3:
+//                        delay_time = 5;
+//                        delay_time_temp = delay_time;
+//                        camera_delay_time.setImageResource(R.drawable.test);
+//                        break;
+//
+//                    case 5:
+//                        delay_time = 10;
+//                        delay_time_temp = delay_time;
+//                        camera_delay_time.setImageResource(R.drawable.test);
+//                        break;
+//
+//                    case 10:
+//                        delay_time = 0;
+//                        delay_time_temp = delay_time;
+//                        camera_delay_time.setImageResource(R.drawable.test);
+//                        break;
+
+//                }
         }
     }
 
+    public void switchCamera() {
+        releaseCamera();
+        mCameraId = (mCameraId + 1) % mCamera.getNumberOfCameras();
+        mCamera = getCamera(mCameraId);
+        if (mHolder != null) {
+            startPreview(mCamera, mHolder);
+        }
+    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mCamera == null) {
+            mCamera = getCamera(mCameraId);
+            if (mHolder != null) {
+                startPreview(mCamera, mHolder);
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        releaseCamera();
+    }
+
+    /**
+     * 获取Camera实例
+     *
+     * @return
+     */
+    private Camera getCamera(int id) {
+        Camera camera = null;
+        try {
+            camera = Camera.open(id);
+        } catch (Exception e) {
+
+        }
+        return camera;
+    }
+
+    /**
+     * 预览相机
+     */
+    private void startPreview(Camera camera, SurfaceHolder holder) {
+        try {
+            setupCamera(camera);
+            camera.setPreviewDisplay(holder);
+            //亲测的一个方法 基本覆盖所有手机 将预览矫正
+            CameraUtil.getInstance().setCameraDisplayOrientation(this, mCameraId, camera);
+//            camera.setDisplayOrientation(90);
+            camera.startPreview();
+            isview = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void capture() {
+        mCamera.takePicture(null, null, new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera) {
+//                camera.setDisplayOrientation(90);
+                isview = false;
+                //将data 转换为位图 或者你也可以直接保存为文件使用 FileOutputStream
+                //这里我相信大部分都有其他用处把 比如加个水印 后续再讲解
+                Bitmap saveBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                saveBitmap = CameraUtil.getInstance().setTakePicktrueOrientation(mCameraId, saveBitmap);
+                Log.d("husterkang", "bitmap "+saveBitmap.getWidth()+" "+saveBitmap.getHeight());
+                saveBitmap = Bitmap.createScaledBitmap(saveBitmap, screenWidth, picHeight, true);
+                Log.d("husterkang", "bitmap1 "+saveBitmap.getWidth()+" "+saveBitmap.getHeight());
+                saveBitmap = Bitmap.createBitmap(saveBitmap, 0, 0, screenWidth, Math.min((int)((screenHeight-actionbarHeight)*0.618), picHeight));
+                Log.d("husterkang", "bitmap2 "+saveBitmap.getWidth()+" "+saveBitmap.getHeight());
+                //下面这句是关键
+                String img_path = getCacheDir().getAbsolutePath() + System.currentTimeMillis() + ".jpeg";
+
+                BitmapUtils.saveJPGE_After(context, saveBitmap, img_path, 100);
+                if(!saveBitmap.isRecycled()){
+                    saveBitmap.recycle();
+                }
+
+                if(!saveBitmap.isRecycled()){
+                    saveBitmap.recycle();
+                }
+
+                Intent intent = new Intent();
+                intent.setData(Uri.fromFile(new File(img_path)));
+//                intent.putExtra(AppConstant.KEY.PIC_WIDTH, screenWidth);
+//                intent.putExtra(AppConstant.KEY.PIC_HEIGHT, picHeight);
+                setResult(RESULT_OK, intent);
+                finish();
+//                camera.startPreview();
+                //这里打印宽高 就能看到 CameraUtil.getInstance().getPropPictureSize(parameters.getSupportedPictureSizes(), 200);
+                // 这设置的最小宽度影响返回图片的大小 所以这里一般这是1000左右把我觉得
+//                Log.d("bitmapWidth==", bitmap.getWidth() + "");
+//                Log.d("bitmapHeight==", bitmap.getHeight() + "");
+            }
+        });
+    }
+
+    /**
+     * 设置
+     */
+    private void setupCamera(Camera camera) {
+        Camera.Parameters parameters = camera.getParameters();
+
+        List<String> focusModes = parameters.getSupportedFocusModes();
+        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+            // Autofocus mode is supported 自动对焦
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+        }
+        //这里第三个参数为最小尺寸 getPropPreviewSize方法会对从最小尺寸开始升序排列 取出所有支持尺寸的最小尺寸
+        Camera.Size previewSize = CameraUtil.getInstance().getPropPreviewSize(parameters.getSupportedPreviewSizes(), screenWidth, (int)((screenHeight-actionbarHeight)*0.618));
+        parameters.setPreviewSize(previewSize.width, previewSize.height);
+        Log.d("pkusz", "screenHeight "+screenHeight);
+        Log.d("pkusz", "previewSize: "+previewSize.width+"  "+previewSize.height);
+        System.out.println("husterkang previewSize: "+previewSize.width+"  "+previewSize.height);
+        Camera.Size pictrueSize = CameraUtil.getInstance().getPropPictureSize(parameters.getSupportedPictureSizes(), previewSize.width, previewSize.height);
+        parameters.setPictureSize(pictrueSize.width, pictrueSize.height);
+        Log.d("pkusz", "pictrueSize: "+pictrueSize.width+"  "+pictrueSize.height);
+        System.out.println("husterkang pictrueSize: "+pictrueSize.width+"  "+pictrueSize.height);
+        camera.setParameters(parameters);
+
+        /**
+         * 设置surfaceView的尺寸 因为camera默认是横屏，所以取得支持尺寸也都是横屏的尺寸
+         * 我们在startPreview方法里面把它矫正了过来，但是这里我们设置设置surfaceView的尺寸的时候要注意 previewSize.height<previewSize.width
+         * previewSize.width才是surfaceView的高度
+         * 一般相机都是屏幕的宽度 这里设置为屏幕宽度 高度自适应 你也可以设置自己想要的大小
+         *
+         */
+
+        Log.d("pkusz", "actionbarHeight "+actionbarHeight);
+        picHeight = screenWidth * previewSize.width / previewSize.height;
+        ViewGroup.LayoutParams params =surfaceView.getLayoutParams();
+        params.width = screenWidth; params.height = picHeight;
+        Log.d("pkusz", "picHeight: "+screenWidth+"  "+picHeight);
+        System.out.println("husterkang picHeight: "+screenWidth+"  "+picHeight);
+        //这里当然可以设置拍照位置 比如居中 我这里就置顶了
+//        params.gravity = Gravity.CENTER;
+        surfaceView.setLayoutParams(params);
+//        surfaceView.setZOrderOnTop(false);
+        RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params1.width =  screenWidth;
+        params1.height = (int)((screenHeight-actionbarHeight)*0.382);
+        params1.setMargins(0, actionbarHeight+(int)((screenHeight-actionbarHeight)*0.618),0,0);
+        System.out.println("husterkang params1.height "+params1.height);
+        buttom_relative.setLayoutParams(params1);
+//        ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(params1);
+//        marginParams.setMargins(0, (screenHeight-actionbarHeight)/2, 0, 0);
+        buttom_relative.bringToFront();
+//        View view = (View)findViewById(R.id.design_bottom_sheet);
+//        params1 = view.getLayoutParams();
+//        params1.height = (int)((screenHeight-actionbarHeight)*0.328);
+//        view.setLayoutParams(params1);
+//        view.bringToFront();
+    }
+    /**
+     * 释放相机资源
+     */
+    private void releaseCamera() {
+        if (mCamera != null) {
+            mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        startPreview(mCamera, holder);
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        mCamera.stopPreview();
+        startPreview(mCamera, holder);
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        releaseCamera();
+    }
 }

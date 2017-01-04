@@ -4,6 +4,21 @@ package com.example.huster.instagram.util;
  * Created by huster on 2016/9/17.
  */
 public class Constant {
+    public final static class IMAGE_FILTER{
+        public final static int SAVE_BIT = 20;
+        public final static int CREATE_RECYCLE_VIEW = 21;
+    }
+    public final static class REQUEST_CODE{
+        public final static int CAMERA = 100;
+        public final static int RESULT_OK = 101;
+    }
+    public final static class RESULT_CODE{
+        public final static int RESULT_OK = 101;
+    }
+    public final static class WHAT{
+        public final static int SUCCESS = 1000;
+        public final static int ERROR = 1001;
+    }
     public final static int FragmentHomeID = 0;
     public final static int FragmentDiscoverID = 1;
     public final static int FragmentLoveID = 3;

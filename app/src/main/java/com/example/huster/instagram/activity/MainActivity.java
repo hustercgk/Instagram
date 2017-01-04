@@ -1,24 +1,20 @@
 package com.example.huster.instagram.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity;
 import com.example.huster.instagram.R;
-import com.example.huster.instagram.factory.FragmentFactory;
 import com.example.huster.instagram.fragment.FragmentDiscover;
 import com.example.huster.instagram.fragment.FragmentHome;
 import com.example.huster.instagram.fragment.FragmentLove;
 import com.example.huster.instagram.fragment.FragmentPersonal;
-import com.example.huster.instagram.util.Constant;
 
 public class MainActivity extends FragmentActivity{
     public Handler mHandler = new Handler(){
@@ -27,6 +23,7 @@ public class MainActivity extends FragmentActivity{
         }
     };
     ImageView []imageView = new ImageView[5];
+    static int actionbarHeight;
 //    private HashMap<String, ImageView> imageViewMap = new HashMap<>();
     int checkId = 0, tag = 0;
     private FragmentManager fragmentManager;
@@ -112,7 +109,7 @@ public class MainActivity extends FragmentActivity{
 //                intent.setAction(Intent.ACTION_GET_CONTENT);
 //                intent.addCategory(Intent.CATEGORY_OPENABLE);
 //                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
-                Intent intent = new Intent(getBaseContext(), CameraActivity.class);
+                Intent intent = new Intent(getBaseContext(), ShowImageActivity.class);
                 startActivity(intent);
             }
         });

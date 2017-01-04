@@ -1,19 +1,63 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_home"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.example.huster.instagram.fragment.FragmentHome">
-    <!-- TODO: Update blank fragment layout -->
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#ffffff"
+    android:orientation="vertical">
     <RelativeLayout
+        android:id="@+id/top_relative"
         android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/actionbar_bg"
         android:layout_height="50dp">
     </RelativeLayout>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/camera_list"
-            android:scrollbars="vertical"
+    <RelativeLayout
+        android:background="#FFFAFA"
+        android:layout_marginTop="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <SurfaceView
+            android:id="@+id/surfaceView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </android.support.v7.widget.RecyclerView>
-</LinearLayout>
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/camera_button_relative"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        >
+        <RelativeLayout
+            android:id="@+id/camera_button_relative_relative"
+            android:layout_width="wrap_content"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/takePicBtn"
+                android:text="takepicture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <Button
+                android:layout_toRightOf="@+id/takePicBtn"
+                android:id="@+id/switchCameraBtn"
+                android:text="switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_below="@+id/camera_button_relative_relative"
+            android:id="@+id/linearlayout3_activity_image_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TabLayout
+                android:background="#ffffff"
+                app:tabMode = "fixed"
+                app:tabIndicatorColor="#000000"
+                android:id="@+id/tablayout_activity_camera"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </android.support.design.widget.TabLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>

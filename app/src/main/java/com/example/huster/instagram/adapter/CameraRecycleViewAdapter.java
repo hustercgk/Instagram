@@ -1,17 +1,15 @@
 package com.example.huster.instagram.adapter;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.huster.instagram.R;
-import com.example.huster.instagram.activity.CameraActivity;
+import com.example.huster.instagram.activity.ShowImageActivity;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -22,7 +20,7 @@ import java.util.ArrayList;
  */
 public class CameraRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
     ArrayList<String> mList;
-    static Context mContext;
+    Context mContext;
     int w; int h;
     private OnRecyclerViewItemClickListener mOnItemClickListener = null;
     public CameraRecycleViewAdapter(Context context, ArrayList<String> list, int w, int h){
@@ -60,7 +58,7 @@ public class CameraRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         Picasso.with(mContext)
                 .load(new File(viewHolder.string))
                 .placeholder(R.drawable.android)//未加载完成时放置的缺省图片
-                .resize(w / 4, h / 5)
+                .resize(w / 3, w / 3)
                 .centerCrop()
                 .into(viewHolder.imageView);
     }
@@ -81,7 +79,7 @@ public class CameraRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
             imageView = (ImageView) v.findViewById(R.id.image_grid);
             /*设置高度，不然高度不会1/5，在placeholder时*/
             ViewGroup.LayoutParams layoutParams =  imageView.getLayoutParams();
-            layoutParams.height = CameraActivity.screenHeight/5;
+            layoutParams.height = (ShowImageActivity.screenWidth)/3;
             imageView.setLayoutParams(layoutParams);
          /**/
         }
